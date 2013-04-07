@@ -1,11 +1,16 @@
 {
-    "name": "sonata-project/doctrine-orm-admin-bundle",
+    "name": "rmzamora/doctrine-orm-admin-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony Sonata / Integrate Doctrine ORM into the SonataAdminBundle",
-    "keywords": ["Admin Generator", "admin", "sonata", "bootstrap", "generator"],
+    "description": "Symfony Sonata / Integrate Doctrine ORM into the SonataAdminBundle, rmzamora forked",
+    "keywords": ["Admin Generator", "admin", "sonata", "bootstrap", "generator", "rmzamora forked"],
     "homepage": "http://sonata-project.org/bundles/admin",
     "license": "MIT",
     "authors": [
+        {
+            "name": "mell m. zamora",
+            "email": "me@mellzamora.com",
+            "homepage": "http://mellzamora.com"
+        },
         {
             "name": "Thomas Rabaix",
             "email": "thomas.rabaix@sonata-project.org",
@@ -18,10 +23,10 @@
     ],
     "require": {
         "doctrine/orm": ">=2.3,<2.4",
-        "sonata-project/admin-bundle": "2.2.*@dev",
-        "sonata-project/block-bundle": "2.2.*@dev",
+        "rmzamora/admin-bundle": "2.2.*@dev",
+        "rmzamora/block-bundle": "2.2.*@dev",
         "symfony/symfony": ">=2.2,<2.3",
-        "knplabs/knp-menu-bundle": "1.1.x-dev"
+        "knplabs/knp-menu-bundle": "2.0.*@dev"
     },
     "autoload": {
         "psr-0": { "Sonata\\DoctrineORMAdminBundle": "" }
