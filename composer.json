@@ -24,7 +24,7 @@
     "require": {
         "doctrine/orm": ">=2.3,<2.4",
         "rmzamora/admin-bundle": "2.2.*@dev",
-        "rmzamora/block-bundle": "2.2.*@dev",
+        "sonata-project/block-bundle": "2.2.*@dev",
         "symfony/symfony": ">=2.2,<2.3",
         "knplabs/knp-menu-bundle": "2.0.*@dev"
     },
