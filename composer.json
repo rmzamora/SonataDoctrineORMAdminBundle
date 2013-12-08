@@ -23,7 +23,7 @@
     ],
     "require": {
         "doctrine/orm": "~2.3",
-        "rmzamora/admin-bundle": "2.3.*@dev",
+        "rmzamora/admin-bundle": "~2.3",
         "symfony/symfony": "~2.3"
     },
     "autoload": {
@@ -32,7 +32,6 @@
     "target-dir": "Sonata/DoctrineORMAdminBundle",
     "extra": {
         "branch-alias": {
-            "dev-2.2": "2.2.x-dev",
             "dev-master": "2.3.x-dev"
         }
     }
