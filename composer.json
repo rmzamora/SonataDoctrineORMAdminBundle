@@ -23,9 +23,13 @@
     ],
     "require": {
         "doctrine/orm": "~2.3",
+        "symfony/form": "~2.4",
+        "symfony/security": "~2.4",
+        "symfony/console": "~2.4",
+        "symfony/doctrine-bridge": "~2.4",
+        "symfony/symfony": "~2.4",        
         "rmzamora/admin-bundle": "~2.3",
-        "symfony/symfony": "~2.3",
-         "sonata-project/core-bundle": "~2.2@dev"
+         "sonata-project/core-bundle": "~2.2"
     },
     "autoload": {
         "psr-0": { "Sonata\\DoctrineORMAdminBundle": "" }
