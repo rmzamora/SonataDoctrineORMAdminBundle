@@ -34,6 +34,8 @@ class ModelManager implements ModelManagerInterface
 {
     protected $registry;
 
+    protected $cache = array();
+
     const ID_SEPARATOR = '~';
 
     /**
@@ -214,13 +216,17 @@ class ModelManager implements ModelManagerInterface
             $class = get_class($class);
         }
 
-        $em = $this->registry->getManagerForClass($class);
+        if (!isset($this->cache[$class])) {
+            $em = $this->registry->getManagerForClass($class);
 
-        if (!$em) {
-            throw new \RuntimeException(sprintf('No entity manager defined for class %s', $class));
+            if (!$em) {
+                throw new \RuntimeException(sprintf('No entity manager defined for class %s', $class));
+            }
+
+            $this->cache[$class] = $em;
         }
 
-        return $em;
+        return $this->cache[$class];
     }
 
     /**
@@ -276,11 +282,12 @@ class ModelManager implements ModelManagerInterface
      */
     public function getIdentifierValues($entity)
     {
-        $entityManager = $this->getEntityManager($entity);
+        // Fix code has an impact on performance, so disable it ...
+        //$entityManager = $this->getEntityManager($entity);
+        //if (!$entityManager->getUnitOfWork()->isInIdentityMap($entity)) {
+        //    throw new \RuntimeException('Entities passed to the choice field must be managed');
+        //}
 
-        if (!$entityManager->getUnitOfWork()->isInIdentityMap($entity)) {
-            throw new \RuntimeException('Entities passed to the choice field must be managed');
-        }
 
         $class = $this->getMetadata(ClassUtils::getClass($entity));
 
@@ -320,11 +327,15 @@ class ModelManager implements ModelManagerInterface
         }
 
         // the entities is not managed
-        if (!$entity || !$this->getEntityManager($entity)->getUnitOfWork()->isInIdentityMap($entity)) {
+        if (!$entity /*|| !$this->getEntityManager($entity)->getUnitOfWork()->isInIdentityMap($entity) // commented for perfomance concern */) {
             return null;
         }
 
         $values = $this->getIdentifierValues($entity);
+
+        if (count($values) === 0) {
+            return null;
+        }
 
         return implode(self::ID_SEPARATOR, $values);
     }
