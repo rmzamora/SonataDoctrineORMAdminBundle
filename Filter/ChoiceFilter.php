@@ -11,15 +11,12 @@
 
 namespace Sonata\DoctrineORMAdminBundle\Filter;
 
-use Doctrine\ORM\QueryBuilder;
-use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Form\Type\Filter\ChoiceType;
+use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 
 class ChoiceFilter extends Filter
 {
     /**
-     * @param ProxyQueryInterface|QueryBuilder $queryBuilder
-     *
      * {@inheritdoc}
      */
     public function filter(ProxyQueryInterface $queryBuilder, $alias, $field, $data)
@@ -37,16 +34,14 @@ class ChoiceFilter extends Filter
                 return;
             }
 
-            // Have to pass IN array value as parameter. See: http://www.doctrine-project.org/jira/browse/DDC-3759
-            $completeField = sprintf('%s.%s', $alias, $field);
-            $parameterName = $this->getNewParameterName($queryBuilder);
             if ($data['type'] == ChoiceType::TYPE_NOT_CONTAINS) {
-                $this->applyWhere($queryBuilder, $queryBuilder->expr()->notIn($completeField, ':'.$parameterName));
+                $this->applyWhere($queryBuilder, $queryBuilder->expr()->notIn(sprintf('%s.%s', $alias, $field ), $data['value']));
             } else {
-                $this->applyWhere($queryBuilder, $queryBuilder->expr()->in($completeField, ':'.$parameterName));
+                $this->applyWhere($queryBuilder, $queryBuilder->expr()->in(sprintf('%s.%s', $alias, $field ), $data['value']));
             }
-            $queryBuilder->setParameter($parameterName, $data['value']);
+
         } else {
+
             if ($data['value'] === '' || $data['value'] === null || $data['value'] === false || $data['value'] === 'all') {
                 return;
             }
@@ -61,22 +56,6 @@ class ChoiceFilter extends Filter
 
             $queryBuilder->setParameter($parameterName, $data['value']);
         }
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return bool
-     */
-    private function getOperator($type)
-    {
-        $choices = array(
-            ChoiceType::TYPE_CONTAINS         => 'IN',
-            ChoiceType::TYPE_NOT_CONTAINS     => 'NOT IN',
-            ChoiceType::TYPE_EQUAL            => '=',
-        );
-
-        return isset($choices[$type]) ? $choices[$type] : false;
     }
 
     /**
@@ -96,7 +75,7 @@ class ChoiceFilter extends Filter
             'operator_type' => 'sonata_type_equal',
             'field_type'    => $this->getFieldType(),
             'field_options' => $this->getFieldOptions(),
-            'label'         => $this->getLabel(),
+            'label'         => $this->getLabel()
         ));
     }
 }

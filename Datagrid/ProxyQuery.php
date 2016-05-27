@@ -11,42 +11,27 @@
 
 namespace Sonata\DoctrineORMAdminBundle\Datagrid;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 
 /**
- * This class try to unify the query usage with Doctrine.
+ * This class try to unify the query usage with Doctrine
  */
 class ProxyQuery implements ProxyQueryInterface
 {
-    /**
-     * @var QueryBuilder
-     */
     protected $queryBuilder;
 
-    /**
-     * @var string
-     */
     protected $sortBy;
 
-    /**
-     * @var mixed
-     */
     protected $sortOrder;
 
-    /**
-     * @var int
-     */
     protected $uniqueParameterId;
 
-    /**
-     * @var string[]
-     */
     protected $entityJoinAliases;
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param mixed $queryBuilder
      */
     public function __construct($queryBuilder)
     {
@@ -67,11 +52,11 @@ class ProxyQuery implements ProxyQueryInterface
         if ($this->getSortBy()) {
             $sortBy = $this->getSortBy();
             if (strpos($sortBy, '.') === false) { // add the current alias
-                $sortBy = $queryBuilder->getRootAlias().'.'.$sortBy;
+                $sortBy = $queryBuilder->getRootAlias() . '.' . $sortBy;
             }
             $queryBuilder->addOrderBy($sortBy, $this->getSortOrder());
         } else {
-            $queryBuilder->resetDQLPart('orderBy');
+            $queryBuilder->resetDQLPart( 'orderBy' );
         }
 
         return $this->getFixedQueryBuilder($queryBuilder)->getQuery()->execute($params, $hydrationMode);
@@ -79,13 +64,13 @@ class ProxyQuery implements ProxyQueryInterface
 
     /**
      * This method alters the query to return a clean set of object with a working
-     * set of Object.
+     * set of Object
      *
-     * @param QueryBuilder $queryBuilder
+     * @param \Doctrine\ORM\QueryBuilder $queryBuilder
      *
-     * @return QueryBuilder
+     * @return \Doctrine\ORM\QueryBuilder
      */
-    protected function getFixedQueryBuilder(QueryBuilder $queryBuilder)
+    private function getFixedQueryBuilder(QueryBuilder $queryBuilder)
     {
         $queryBuilderId = clone $queryBuilder;
 
@@ -110,7 +95,7 @@ class ProxyQuery implements ProxyQueryInterface
             if ($metadata->hasAssociation($idName)) {
                 $idSelect = sprintf('IDENTITY(%s) as %s', $idSelect, $idName);
             }
-            $idxSelect .= ($idxSelect !== '' ? ', ' : '').$idSelect;
+            $idxSelect .= ($idxSelect !== '' ? ', ' : '') . $idSelect;
         }
         $queryBuilderId->resetDQLPart('select');
         $queryBuilderId->add('select', 'DISTINCT '.$idxSelect);
@@ -125,7 +110,7 @@ class ProxyQuery implements ProxyQueryInterface
         if ($this->getSortBy()) {
             $sortBy = $this->getSortBy();
             if (strpos($sortBy, '.') === false) { // add the current alias
-                $sortBy = $queryBuilderId->getRootAlias().'.'.$sortBy;
+                $sortBy = $queryBuilderId->getRootAlias() . '.' . $sortBy;
             }
             $sortBy .= ' AS __order_by';
             $queryBuilderId->addSelect($sortBy);
@@ -143,7 +128,6 @@ class ProxyQuery implements ProxyQueryInterface
         foreach ($idxMatrix as $idName => $idx) {
             if (count($idx) > 0) {
                 $idxParamName = sprintf('%s_idx', $idName);
-                $idxParamName = preg_replace('/[^\w]+/', '_', $idxParamName);
                 $queryBuilder->andWhere(sprintf('%s IN (:%s)', $selects[$idName], $idxParamName));
                 $queryBuilder->setParameter($idxParamName, $idx);
                 $queryBuilder->setMaxResults(null);
@@ -176,7 +160,7 @@ class ProxyQuery implements ProxyQueryInterface
     public function setSortBy($parentAssociationMappings, $fieldMapping)
     {
         $alias        = $this->entityJoin($parentAssociationMappings);
-        $this->sortBy = $alias.'.'.$fieldMapping['fieldName'];
+        $this->sortBy = $alias . '.' . $fieldMapping['fieldName'];
 
         return $this;
     }
@@ -286,25 +270,8 @@ class ProxyQuery implements ProxyQueryInterface
 
         $newAlias = 's';
 
-        $joinedEntities = $this->queryBuilder->getDQLPart('join');
-
         foreach ($associationMappings as $associationMapping) {
-
-             // Do not add left join to already joined entities with custom query
-             foreach ($joinedEntities as $joinExprList) {
-                 foreach ($joinExprList as $joinExpr) {
-                     $newAliasTmp = $joinExpr->getAlias();
-
-                     if (sprintf('%s.%s', $alias, $associationMapping['fieldName']) === $joinExpr->getJoin()) {
-                         $this->entityJoinAliases[] = $newAliasTmp;
-                         $alias = $newAliasTmp;
-
-                         continue 3;
-                     }
-                 }
-             }
-
-            $newAlias .= '_'.$associationMapping['fieldName'];
+            $newAlias .= '_' . $associationMapping['fieldName'];
             if (!in_array($newAlias, $this->entityJoinAliases)) {
                 $this->entityJoinAliases[] = $newAlias;
                 $this->queryBuilder->leftJoin(sprintf('%s.%s', $alias, $associationMapping['fieldName']), $newAlias);
