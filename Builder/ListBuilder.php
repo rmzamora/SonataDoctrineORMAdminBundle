@@ -11,28 +11,23 @@
 
 namespace Sonata\DoctrineORMAdminBundle\Builder;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Sonata\AdminBundle\Admin\FieldDescriptionInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Admin\FieldDescriptionCollection;
-use Sonata\AdminBundle\Admin\FieldDescriptionInterface;
 use Sonata\AdminBundle\Builder\ListBuilderInterface;
 use Sonata\AdminBundle\Guesser\TypeGuesserInterface;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 class ListBuilder implements ListBuilderInterface
 {
-    /**
-     * @var TypeGuesserInterface
-     */
     protected $guesser;
 
-    /**
-     * @var string[]
-     */
     protected $templates = array();
 
     /**
-     * @param TypeGuesserInterface $guesser
-     * @param string[]             $templates
+     * @param \Sonata\AdminBundle\Guesser\TypeGuesserInterface $guesser
+     * @param array                                            $templates
      */
     public function __construct(TypeGuesserInterface $guesser, array $templates = array())
     {
@@ -45,7 +40,7 @@ class ListBuilder implements ListBuilderInterface
      */
     public function getBaseList(array $options = array())
     {
-        return new FieldDescriptionCollection();
+        return new FieldDescriptionCollection;
     }
 
     /**
@@ -82,7 +77,7 @@ class ListBuilder implements ListBuilderInterface
     private function getTemplate($type)
     {
         if (!isset($this->templates[$type])) {
-            return;
+            return null;
         }
 
         return $this->templates[$type];
@@ -129,10 +124,12 @@ class ListBuilder implements ListBuilderInterface
         $fieldDescription->setOption('label', $fieldDescription->getOption('label', $fieldDescription->getName()));
 
         if (!$fieldDescription->getTemplate()) {
+
             $fieldDescription->setTemplate($this->getTemplate($fieldDescription->getType()));
 
             if (!$fieldDescription->getTemplate()) {
-                switch ($fieldDescription->getMappingType()) {
+
+                switch($fieldDescription->getMappingType()) {
                     case ClassMetadataInfo::MANY_TO_ONE:
                         $fieldDescription->setTemplate('SonataDoctrineORMAdminBundle:CRUD:list_orm_many_to_one.html.twig');
                         break;
@@ -146,18 +143,24 @@ class ListBuilder implements ListBuilderInterface
                         $fieldDescription->setTemplate('SonataDoctrineORMAdminBundle:CRUD:list_orm_many_to_many.html.twig');
                         break;
                 }
+
             }
         }
 
-        if (in_array($fieldDescription->getMappingType(), array(ClassMetadataInfo::MANY_TO_ONE, ClassMetadataInfo::ONE_TO_ONE, ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::MANY_TO_MANY))) {
-            $admin->attachAdminClass($fieldDescription);
+        switch($fieldDescription->getMappingType()) {
+            case ClassMetadataInfo::MANY_TO_ONE:
+            case ClassMetadataInfo::ONE_TO_ONE:
+            case ClassMetadataInfo::ONE_TO_MANY:
+            case ClassMetadataInfo::MANY_TO_MANY:
+                $admin->attachAdminClass($fieldDescription);
+                break;
         }
     }
 
     /**
-     * @param FieldDescriptionInterface $fieldDescription
+     * @param \Sonata\AdminBundle\Admin\FieldDescriptionInterface $fieldDescription
      *
-     * @return FieldDescriptionInterface
+     * @return \Sonata\AdminBundle\Admin\FieldDescriptionInterface
      */
     public function buildActionFieldDescription(FieldDescriptionInterface $fieldDescription)
     {
